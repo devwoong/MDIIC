@@ -23,8 +23,8 @@ func ClientMain() {
 
 	for {
 		server := ""
-		fmt.Printf("Enter the Server address :")
-		fmt.Scan("%s", &server)
+		fmt.Printf("Enter the Server address \n")
+		fmt.Scanf("%s", &server)
 		if server == "" {
 			continue
 		}
