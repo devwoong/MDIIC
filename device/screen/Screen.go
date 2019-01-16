@@ -15,10 +15,10 @@ func (s *Screen) SetSize(width, height int) {
 	s.height = height
 }
 
-func (s *Screen) getSize() (int, int) {
+func (s *Screen) GetSize() (int, int) {
 	return s.width, s.height
 }
 
-func (s *Screen) getScreen() (int, int, int, int) {
+func (s *Screen) GetScreen() (int, int, int, int) {
 	return s.x, s.y, s.width, s.height
 }

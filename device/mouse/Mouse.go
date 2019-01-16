@@ -15,3 +15,11 @@ func (m *MousePos) GetVelocity(src MousePos) (int, int) {
 func (m *MousePos) GetOffsetVal(x, y int) (int, int) {
 	return m.x + x, m.y + y
 }
+
+type Mouse struct {
+	MousePos
+	MoveX              int
+	MoveY              int
+	CurrentFoucsScreen int
+	Message            device.Message
+}

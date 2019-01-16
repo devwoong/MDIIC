@@ -29,7 +29,7 @@ func ServerMain() {
 	server = protocol.Server{}
 	server.Initialize()
 
-	go controller.GetInstance().AppMain()
+	go controller.GetInstance().AppMain(true)
 	connectLoop(listener)
 }
 func connectLoop(listener *(net.TCPListener)) {

@@ -4,12 +4,12 @@ import "MDIIC/device"
 
 type MultipleScreen struct {
 	Main              Screen
-	SubScreens        map[string]Screen
-	WeightRateScreens map[string]device.Point
+	SubScreens        map[int]Screen
+	WeightRateScreens map[int]device.Point
 }
 
 func (m *MultipleScreen) SetWeight() {
-	m.WeightRateScreens = make(map[string]device.Point)
+	m.WeightRateScreens = make(map[int]device.Point)
 	for i, sub := range m.SubScreens {
 		widthWeight := (m.Main.width / sub.width)
 		heightWeight := (m.Main.height / sub.height)
@@ -17,4 +17,11 @@ func (m *MultipleScreen) SetWeight() {
 		weight.SetPoint(widthWeight, heightWeight)
 		m.WeightRateScreens[i] = weight
 	}
+}
+
+func NewMultiScreen() MultipleScreen {
+	resultScreen := MultipleScreen{}
+	resultScreen.SubScreens = make(map[int]Screen)
+	resultScreen.WeightRateScreens = make(map[int]device.Point)
+	return resultScreen
 }

@@ -46,7 +46,7 @@ func ClientMain() {
 	go recvMsgProc()
 	go tick()
 	go sendMessage()
-	go controller.GetInstance().AppMain()
+	go controller.GetInstance().AppMain(false)
 	for {
 
 	}
