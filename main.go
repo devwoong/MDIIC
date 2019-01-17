@@ -13,6 +13,7 @@ func main() {
 	for {
 		fmt.Printf("Choose Server(1) or Client(2) \n")
 		fmt.Scanf("%d", &choose)
+		//choose = 1
 		if choose == 1 || choose == 2 {
 			break
 		}

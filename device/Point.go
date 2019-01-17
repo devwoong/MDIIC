@@ -1,28 +1,28 @@
 package device
 
 type Point struct {
-	x int
-	y int
+	X int
+	Y int
 }
 
-func (m *Point) SetPoint(x, y int) {
-	m.x = x
-	m.y = y
+func (m *Point) SetPoint(X, Y int) {
+	m.X = X
+	m.Y = Y
 }
 
 func (m *Point) GetPoint() (int, int) {
-	return m.x, m.y
+	return m.X, m.Y
 }
 func (m *Point) Equals(dest *Point) bool {
-	if m.x == dest.x && m.y == dest.y {
+	if m.X == dest.X && m.Y == dest.Y {
 		return true
 	} else {
 		return false
 	}
 }
 
-func (m *Point) PointEquals(x, y int) bool {
-	if m.x == x && m.y == y {
+func (m *Point) PointEquals(X, Y int) bool {
+	if m.X == X && m.Y == Y {
 		return true
 	} else {
 		return false
@@ -30,14 +30,14 @@ func (m *Point) PointEquals(x, y int) bool {
 }
 
 func (m *Point) Initialize(src Point) {
-	m.x = src.x
-	m.y = src.y
+	m.X = src.X
+	m.Y = src.Y
 }
 
-func (m *Point) GetVelocity(src Point) (int, int) {
-	return m.x - src.x, m.y - src.y
+func (m *Point) GetVelocitY(src Point) (int, int) {
+	return m.X - src.X, m.Y - src.Y
 }
 
-func (m *Point) GetOffsetVal(x, y int) (int, int) {
-	return m.x + x, m.y + y
+func (m *Point) GetOffsetVal(X, Y int) (int, int) {
+	return m.X + X, m.Y + Y
 }

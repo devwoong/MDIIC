@@ -1,16 +1,18 @@
 package protocol
 
 import (
+	"MDIIC/common"
 	"fmt"
 	"net"
 	"os"
+	"sync"
 )
 
 type server struct {
 	Service     string
 	Conn        net.Conn
-	RecvMessage chan Message
-	SendMessage chan Message
+	RecvMessage chan common.Message
+	SendMessage chan common.Message
 }
 
 func (s *server) ConnectServer() error {
@@ -30,10 +32,13 @@ func checkError(err error) {
 }
 
 var serverInstance *server
+var mu sync.Mutex
 
 func GetInstance() *server {
+	mu.Lock()
+	defer mu.Unlock()
 	if serverInstance == nil {
-		serverInstance = &server{"localhost:1201", nil, make(chan Message), make(chan Message)}
+		serverInstance = &server{"localhost:1201", nil, make(chan common.Message), make(chan common.Message)}
 	}
 	return serverInstance
 }

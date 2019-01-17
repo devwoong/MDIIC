@@ -1,6 +1,7 @@
 package server
 
 import (
+	"MDIIC/common"
 	"MDIIC/controller"
 	"MDIIC/tcp/server/protocol"
 	"bufio"
@@ -55,21 +56,20 @@ func clientHandle(conn net.Conn, id int) {
 
 	go sendMessageHandle(id)
 	go recvMessageHandle(id)
-	messageRead(id)
+	go messageRead(id)
+	for {
+
+	}
 }
 
 func messageRead(id int) {
 	for {
-		readPacket := protocol.Packet{}
-
 		r := bufio.NewReader(server.Clients[id].Conn)
-		readPacket.Data = make([]byte, 1024)
-		n, err := r.Read(readPacket.Data)
+		Data := make([]byte, 1024)
+		n, err := r.Read(Data)
 		//n, err := conn.Read(readPacket.Data)
 		if err == io.EOF {
-			exit := "&&EXIT&&"
-			exitMessage := protocol.Message{}
-			exitMessage.Msg = exit
+			exitMessage := common.Message{}
 			server.Clients[id].SendPacket <- exitMessage
 			server.Clients[id].RecvPacket <- exitMessage
 			fmt.Printf("client exit id : %d, ip : %s \n", id, server.Clients[id].Conn.RemoteAddr())
@@ -78,7 +78,8 @@ func messageRead(id int) {
 			return
 		}
 		if n != 0 {
-			message := readPacket.UnPack(n)
+			var message common.Message
+			err = common.ByteToObject(Data, &message)
 			server.Clients[id].SendPacket <- message
 			fmt.Printf("read size : %d \n", n)
 		}
@@ -91,21 +92,25 @@ EXITRECV:
 	for {
 		select {
 		case message := <-server.Clients[id].SendPacket:
-			switch message.Msg {
-			case "&&EXIT&&":
+			switch message.Type {
+			case common.MSG_EXIT:
 				break EXITRECV
-			case "&&ISALIVE&&":
+			case common.MSG_ALIVE:
 				{
-					Message := protocol.Message{}
-					Message.Msg = "&&ALIVE&&"
+					Message := common.Message{}
+					Message.Type = common.MSG_ALIVE
 					server.Clients[id].RecvPacket <- Message
 				}
 			// case "&&ALIVE&&":
 			// 	{
 			// 		server.Clients[id].IsAlive = true
 			// 	}
+			case common.MSG_STRING:
+				{
+					fmt.Printf("client %d message : %s \n", id, string(message.Message))
+				}
 			default:
-				fmt.Printf("client %d message : %s \n", id, message.Msg)
+				fmt.Printf("client %d message : %s \n", id, message.Type)
 			}
 		}
 	}
@@ -115,41 +120,21 @@ EXIT:
 	for {
 		select {
 		case message := <-server.Clients[id].RecvPacket:
-			switch message.Msg {
-			case "&&EXIT&&":
+			switch message.Type {
+			case common.MSG_EXIT:
 				break EXIT
-			default:
-				sendPack := message.Pack()
-				_, err := server.Clients[id].Conn.Write(sendPack.Data[:])
+			case common.MSG_ALIVE:
+				_, err := server.Clients[id].Conn.Write(common.ObjectToByte(message))
 				if err != nil {
 
 				}
+			}
+		case appMessage := <-controller.GetInstance().SendMessage:
+			for _, c := range server.Clients {
+
+				c.SendPacket <- appMessage
 			}
 		}
 	}
 	return true
 }
-
-// func isAlivceClient() {
-// 	live := "&&ISALIVE&&"
-// 	Message := protocol.Message{}
-// 	Message.Msg = live
-// 	for {
-// 		for _, client := range server.Clients {
-// 			if client == nil {
-// 				continue
-// 			}
-// 			go func(client *protocol.Client) {
-// 				if client.IsAlive == false {
-// 					fmt.Printf("client %d exit \n", client.ClientID)
-// 					server.DeleteClient(client.ClientID)
-// 				} else {
-// 					client.RecvPacket <- Message
-// 					client.IsAlive = false
-// 				}
-// 				time.Sleep(time.Second * 10)
-// 			}(client)
-// 		}
-// 		time.Sleep(time.Second * 10)
-// 	}
-// }

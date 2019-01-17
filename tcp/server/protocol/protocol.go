@@ -1,12 +1,15 @@
 package protocol
 
-import "net"
+import (
+	"MDIIC/common"
+	"net"
+)
 
 type Client struct {
 	Conn       net.Conn
 	ClientID   int
-	SendPacket chan Message
-	RecvPacket chan Message
+	SendPacket chan common.Message
+	RecvPacket chan common.Message
 	IsAlive    bool
 	Exit       chan bool
 }
@@ -33,13 +36,13 @@ func (c *Client) CreateClient(conn net.Conn, id int) {
 	c.Conn = conn
 	c.ClientID = id
 	c.IsAlive = true
-	c.SendPacket = make(chan Message)
-	c.RecvPacket = make(chan Message)
+	c.SendPacket = make(chan common.Message)
+	c.RecvPacket = make(chan common.Message)
 }
-func (c *Client) GetSendPacket() chan Message {
+func (c *Client) GetSendPacket() chan common.Message {
 	return c.SendPacket
 }
-func (c *Client) GetRecvPacket() chan Message {
+func (c *Client) GetRecvPacket() chan common.Message {
 	return c.RecvPacket
 }
 func (c *Client) GetConnection() net.Conn {

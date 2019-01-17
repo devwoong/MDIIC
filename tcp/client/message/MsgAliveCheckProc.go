@@ -1,6 +1,7 @@
 package message
 
 import (
+	"MDIIC/common"
 	"MDIIC/tcp/client/protocol"
 	"fmt"
 	"net"
@@ -14,23 +15,20 @@ type AliveCheck struct {
 	IsAlivce     bool
 }
 
-func (ac *AliveCheck) RecvMessage(msg protocol.Message) (bool, protocol.Message) {
+func (ac *AliveCheck) RecvMessage(msg common.Message) bool {
 	fmt.Printf("isAlive \n")
-	resultPack := protocol.Message{}
-	switch msg.Msg {
-	case "&&ISALIVE%%":
-		resultPack.Msg = "&&ALIVE&&"
-	case "&&ALIVE&&":
+	switch msg.Type {
+	case common.MSG_ALIVE:
 		ac.IsAlivce = true
 	}
-	return false, resultPack
+	return false
 }
 
 func (ac *AliveCheck) SendMessage(conn net.Conn) {
 	for {
-		sendMsg := protocol.Message{}
-		sendMsg.Msg = "&&ISALIVE&&"
-		conn.Write(sendMsg.Pack().Data[:])
+		sendMsg := common.Message{}
+		sendMsg.Type = common.MSG_ALIVE
+		conn.Write(common.ObjectToByte(sendMsg))
 
 		time.Sleep(time.Second * 10)
 		if ac.IsAlivce == false {

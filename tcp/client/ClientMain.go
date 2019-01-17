@@ -1,12 +1,12 @@
 package client
 
 import (
+	"MDIIC/common"
 	"MDIIC/controller"
 	"MDIIC/tcp/client/message"
 	"MDIIC/tcp/client/protocol"
 	"bufio"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -25,6 +25,7 @@ func ClientMain() {
 		server := ""
 		fmt.Printf("Enter the Server address \n")
 		fmt.Scanf("%s", &server)
+		//server = "127.0.0.1"
 		if server == "" {
 			continue
 		}
@@ -53,16 +54,16 @@ func ClientMain() {
 }
 func recvMessage() {
 	for {
-		readPacket := protocol.Packet{}
-
 		r := bufio.NewReader(protocol.GetInstance().Conn)
-		readPacket.Data = make([]byte, 1024)
-		n, err := r.Read(readPacket.Data)
+		Data := make([]byte, 1024)
+		n, err := r.Read(Data)
 		if err != nil {
 			return
 		}
 		if n > 0 {
-			protocol.GetInstance().RecvMessage <- readPacket.UnPack(n)
+			var message common.Message
+			common.ByteToObject(Data, &message)
+			protocol.GetInstance().RecvMessage <- message
 			// message := readPacket.UnPack(n)
 		}
 	}
@@ -73,16 +74,13 @@ RECV_EXIT:
 	for {
 		select {
 		case msg := <-protocol.GetInstance().RecvMessage:
-			switch msg.Msg {
-			case "&&EXIT&&":
+			switch msg.Type {
+			case common.MSG_EXIT:
 				break RECV_EXIT
-			default:
-				log.Printf("Receive: %s \n", msg.Msg)
+			case common.MSG_ALIVE:
+				//log.Printf("Receive: %s \n", msg.Message)
 				for _, v := range messageProcs {
-					isSend, sendMsg := v.RecvMessage(msg)
-					if isSend == true {
-						protocol.GetInstance().SendMessage <- sendMsg
-					}
+					v.RecvMessage(msg)
 				}
 			}
 		}
@@ -94,8 +92,9 @@ func tick() {
 		go v.SendMessage(protocol.GetInstance().Conn)
 	}
 	for {
-		message := protocol.Message{}
-		message.Msg = "TICK TICK"
+		message := common.Message{}
+		message.Type = common.MSG_STRING
+		message.Message = []byte("TICK TICK")
 		protocol.GetInstance().SendMessage <- message
 		time.Sleep(time.Second * 1)
 	}
@@ -105,12 +104,16 @@ func sendMessage() {
 SEND_EXIT:
 	for {
 		select {
-		case msg := <-protocol.GetInstance().SendMessage:
-			switch msg.Msg {
-			case "&&EXIT&&":
+		case AppMsg := <-protocol.GetInstance().SendMessage:
+			switch AppMsg.Type {
+			case common.MSG_EXIT:
 				break SEND_EXIT
-			default:
-				protocol.GetInstance().Conn.Write(msg.Pack().Data[:])
+			case common.MSG_ALIVE:
+				protocol.GetInstance().Conn.Write(common.ObjectToByte(AppMsg))
+				fmt.Print(" :: %s\n", AppMsg.Message)
+			case common.MSG_STRING:
+				protocol.GetInstance().Conn.Write(common.ObjectToByte(AppMsg))
+				fmt.Print(" :: %s\n", AppMsg.Message)
 			}
 		}
 	}

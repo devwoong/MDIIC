@@ -4,22 +4,18 @@ import "MDIIC/device"
 
 type MousePos struct {
 	device.Point
-	x int
-	y int
 }
 
 func (m *MousePos) GetVelocity(src MousePos) (int, int) {
-	return m.x - src.x, m.y - src.y
+	return m.X - src.X, m.Y - src.Y
 }
 
-func (m *MousePos) GetOffsetVal(x, y int) (int, int) {
-	return m.x + x, m.y + y
+func (m *MousePos) GetOffsetVal(X, Y int) (int, int) {
+	return m.X + X, m.Y + Y
 }
 
 type Mouse struct {
-	MousePos
-	MoveX              int
-	MoveY              int
-	CurrentFoucsScreen int
-	Message            device.Message
+	device.Point
+	MoveX int
+	MoveY int
 }

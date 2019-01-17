@@ -1,11 +1,11 @@
 package message
 
 import (
-	"MDIIC/tcp/client/protocol"
+	"MDIIC/common"
 	"net"
 )
 
 type MessageProc interface {
-	RecvMessage(msg protocol.Message) (bool, protocol.Message)
+	RecvMessage(msg common.Message) bool
 	SendMessage(conn net.Conn)
 }
