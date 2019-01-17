@@ -56,10 +56,7 @@ func clientHandle(conn net.Conn, id int) {
 
 	go sendMessageHandle(id)
 	go recvMessageHandle(id)
-	go messageRead(id)
-	for {
-
-	}
+	messageRead(id)
 }
 
 func messageRead(id int) {
@@ -70,6 +67,7 @@ func messageRead(id int) {
 		//n, err := conn.Read(readPacket.Data)
 		if err == io.EOF {
 			exitMessage := common.Message{}
+			exitMessage.Type = common.MSG_EXIT
 			server.Clients[id].SendPacket <- exitMessage
 			server.Clients[id].RecvPacket <- exitMessage
 			fmt.Printf("client exit id : %d, ip : %s \n", id, server.Clients[id].Conn.RemoteAddr())

@@ -110,10 +110,9 @@ SEND_EXIT:
 				break SEND_EXIT
 			case common.MSG_ALIVE:
 				protocol.GetInstance().Conn.Write(common.ObjectToByte(AppMsg))
-				fmt.Print(" :: %s\n", AppMsg.Message)
 			case common.MSG_STRING:
 				protocol.GetInstance().Conn.Write(common.ObjectToByte(AppMsg))
-				fmt.Print(" :: %s\n", AppMsg.Message)
+				fmt.Printf(" :: %s\n", string(AppMsg.Message))
 			}
 		}
 	}
