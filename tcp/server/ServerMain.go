@@ -130,7 +130,7 @@ EXIT:
 		case appMessage := <-controller.GetInstance().SendMessage:
 			for _, c := range server.Clients {
 
-				c.SendPacket <- appMessage
+				c.Conn.Write(common.ObjectToByte(appMessage))
 			}
 		}
 	}

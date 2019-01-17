@@ -3,11 +3,13 @@ package client
 import (
 	"MDIIC/common"
 	"MDIIC/controller"
+	device "MDIIC/device/mouse"
 	"MDIIC/tcp/client/message"
 	"MDIIC/tcp/client/protocol"
 	"bufio"
+	"bytes"
+	"encoding/gob"
 	"fmt"
-	"time"
 )
 
 var messageProcs []message.MessageProc
@@ -82,7 +84,19 @@ RECV_EXIT:
 				for _, v := range messageProcs {
 					v.RecvMessage(msg)
 				}
+			case common.MSG_MOUSE:
+				if msg.Code == common.MOUSE_MOVE {
+					mouse := device.Mouse{}
+					buf := bytes.NewBuffer(msg.Message)
+					d := gob.NewDecoder(buf)
+					if err := d.Decode(&mouse); err != nil {
+						panic(err)
+					}
+					fmt.Printf("Move X : %d, Move Y : %d\n", mouse.MoveX, mouse.MoveY)
+
+				}
 			}
+
 		}
 	}
 }
@@ -91,13 +105,13 @@ func tick() {
 	for _, v := range messageProcs {
 		go v.SendMessage(protocol.GetInstance().Conn)
 	}
-	for {
-		message := common.Message{}
-		message.Type = common.MSG_STRING
-		message.Message = []byte("TICK TICK")
-		protocol.GetInstance().SendMessage <- message
-		time.Sleep(time.Second * 1)
-	}
+	// for {
+	// 	message := common.Message{}
+	// 	message.Type = common.MSG_STRING
+	// 	message.Message = []byte("TICK TICK")
+	// 	protocol.GetInstance().SendMessage <- message
+	// 	time.Sleep(time.Second * 1)
+	// }
 }
 
 func sendMessage() {
