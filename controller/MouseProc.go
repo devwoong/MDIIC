@@ -13,12 +13,14 @@ type MouseEvent struct {
 	app        *appObject
 	currentPos mouse.MousePos
 	prevPos    mouse.MousePos
+	onEvent    bool
 }
 
 func (m *MouseEvent) Initialize(app *appObject) {
 	m.currentPos = mouse.MousePos{Point: device.Point{0, 0}}
 	m.prevPos = mouse.MousePos{Point: device.Point{0, 0}}
 	m.app = app
+	m.onEvent = false
 }
 
 func (m *MouseEvent) MouseProc() {
@@ -61,8 +63,17 @@ func (m *MouseEvent) MouseProc() {
 		}
 
 	}
-	// btn := robotgo.AddEvent("mleft")
-	// if btn == 0 {
-	// 	fmt.Printf("%d - %d\n", m.currentPos.X, m.prevPos.X)
-	// }
+	if m.onEvent == false {
+		go m.onMouseEvent()
+	}
+}
+
+func (m *MouseEvent) onMouseEvent() {
+	m.onEvent = true
+	btn := robotgo.AddEvent("mright")
+	if btn == 0 {
+		m.app.IsFoucs = true
+		fmt.Printf("%d - %d\n", m.currentPos.X, m.prevPos.X)
+	}
+	m.onEvent = false
 }
