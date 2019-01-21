@@ -3,12 +3,9 @@ package client
 import (
 	"MDIIC/common"
 	"MDIIC/controller"
-	device "MDIIC/device/mouse"
 	"MDIIC/tcp/client/message"
 	"MDIIC/tcp/client/protocol"
 	"bufio"
-	"bytes"
-	"encoding/gob"
 	"fmt"
 )
 
@@ -85,16 +82,7 @@ RECV_EXIT:
 					v.RecvMessage(msg)
 				}
 			case common.MSG_MOUSE:
-				if msg.Code == common.MOUSE_MOVE {
-					mouse := device.Mouse{}
-					buf := bytes.NewBuffer(msg.Message)
-					d := gob.NewDecoder(buf)
-					if err := d.Decode(&mouse); err != nil {
-						panic(err)
-					}
-					fmt.Printf("Move X : %d, Move Y : %d\n", mouse.MoveX, mouse.MoveY)
-
-				}
+				controller.GetInstance().RecvMessage <- msg
 			}
 
 		}
