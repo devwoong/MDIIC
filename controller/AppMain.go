@@ -88,7 +88,25 @@ EVENTEXIT:
 				}
 			case common.MSG_SCREEN:
 				{
+					mouse := device.Mouse{}
+					buf := bytes.NewBuffer(message.Message)
+					d := gob.NewDecoder(buf)
+					if err := d.Decode(&mouse); err != nil {
+						panic(err)
+					}
 
+					switch message.Code {
+					case common.SCREEN_FOCUS_LEFT_CHANGE:
+						if app.IsServer == false {
+							app.IsFoucs = true
+							x, _ := app.Screen.Main.GetSize()
+							g_mouseEvent.SetMousePos(x, mouse.Y)
+						}
+					case common.SCREEN_FOCUS_RIGHT_CHANGE:
+						if app.IsServer == true {
+							g_mouseEvent.SetMousePos(0, mouse.Y)
+						}
+					}
 				}
 			default:
 				{

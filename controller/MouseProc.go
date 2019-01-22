@@ -40,6 +40,10 @@ func (m *MouseEvent) MouseProc() {
 					focusChange := common.Message{}
 					focusChange.Type = common.MSG_SCREEN
 					focusChange.Code = common.SCREEN_FOCUS_LEFT_CHANGE
+					mouseMsg := mouse.Mouse{}
+					mouseMsg.X = cx
+					mouseMsg.Y = cy
+					focusChange.Message = common.ObjectToByte(mouseMsg)
 					m.app.SendMessage <- focusChange
 				}
 			} else if cx >= width-1 && px >= width-1 {
@@ -50,6 +54,10 @@ func (m *MouseEvent) MouseProc() {
 					focusChange := common.Message{}
 					focusChange.Type = common.MSG_SCREEN
 					focusChange.Code = common.SCREEN_FOCUS_RIGHT_CHANGE
+					mouseMsg := mouse.Mouse{}
+					mouseMsg.X = cx
+					mouseMsg.Y = cy
+					focusChange.Message = common.ObjectToByte(mouseMsg)
 					m.app.SendMessage <- focusChange
 				}
 			}
@@ -90,4 +98,8 @@ func (m *MouseEvent) onMouseEvent() {
 
 func (m *MouseEvent) MouseMove(x, y int) {
 	robotgo.MoveMouse(m.currentPos.X+x, m.currentPos.Y+y)
+}
+
+func (m *MouseEvent) SetMousePos(x, y int) {
+	robotgo.MoveMouse(x, y)
 }

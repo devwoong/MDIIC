@@ -83,6 +83,8 @@ RECV_EXIT:
 				}
 			case common.MSG_MOUSE:
 				controller.GetInstance().RecvMessage <- msg
+			case common.MSG_SCREEN:
+				controller.GetInstance().RecvMessage <- msg
 			}
 
 		}
