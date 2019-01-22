@@ -77,3 +77,7 @@ func (m *MouseEvent) onMouseEvent() {
 	}
 	m.onEvent = false
 }
+
+func (m *MouseEvent) MouseMove(x, y int) {
+	robotgo.MoveMouse(m.currentPos.X+x, m.currentPos.Y+y)
+}

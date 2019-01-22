@@ -23,6 +23,8 @@ type appObject struct {
 	IsFoucs         bool
 }
 
+var g_mouseEvent MouseEvent
+
 func (app *appObject) AppMain(IsServer bool) {
 	// robotgo.ScrollMouse(10, "up")
 	// robotgo.MouseClick("left", true)
@@ -32,13 +34,13 @@ func (app *appObject) AppMain(IsServer bool) {
 	app.IsFoucs = IsServer
 	app.Screen.Main.SetSize(robotgo.GetScreenSize())
 
-	mouseEvent := MouseEvent{}
-	mouseEvent.Initialize(app)
+	g_mouseEvent = MouseEvent{}
+	g_mouseEvent.Initialize(app)
 
 	go app.recvEvent()
 
 	for {
-		mouseEvent.MouseProc()
+		g_mouseEvent.MouseProc()
 		time.Sleep(time.Millisecond * 50)
 	}
 }
@@ -75,6 +77,7 @@ EVENTEXIT:
 						if err := d.Decode(&mouse); err != nil {
 							panic(err)
 						}
+						g_mouseEvent.MouseMove(mouse.MoveX, mouse.MoveY)
 						fmt.Printf("Move X : %d, Move Y : %d\n", mouse.MoveX, mouse.MoveY)
 					}
 
