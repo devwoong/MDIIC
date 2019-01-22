@@ -26,7 +26,8 @@ const (
 )
 
 const (
-	SCREEN_FOCUS_CHANGE MSG_CODE = iota
+	SCREEN_FOCUS_LEFT_CHANGE MSG_CODE = iota
+	SCREEN_FOCUS_RIGHT_CHANGE
 )
 
 // type Baser interface {

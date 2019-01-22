@@ -116,6 +116,13 @@ SEND_EXIT:
 				protocol.GetInstance().Conn.Write(common.ObjectToByte(AppMsg))
 				fmt.Printf(" :: %s\n", string(AppMsg.Message))
 			}
+		case clientMsg := <-controller.GetInstance().SendMessage:
+			switch clientMsg.Type {
+			case common.MSG_EXIT:
+				break SEND_EXIT
+			case common.MSG_SCREEN:
+				protocol.GetInstance().Conn.Write(common.ObjectToByte(clientMsg))
+			}
 		}
 	}
 }
