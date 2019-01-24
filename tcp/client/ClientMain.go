@@ -28,6 +28,7 @@ func ClientMain() {
 		if server == "" {
 			continue
 		}
+		protocol.GetInstance().Service = server
 		err := protocol.GetInstance().ConnectServer()
 		if err != nil {
 			continue
