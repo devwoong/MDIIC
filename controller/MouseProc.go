@@ -64,8 +64,7 @@ func (m *MouseEvent) MouseProc() {
 			}
 		}
 		m.prevPos.Initialize(m.currentPos.Point)
-	} else {
-		// ox, oy := m.currentPos.GetVelocity(m.prevPos)
+	} else if m.app.IsServer == true {
 		if m.currentPos.X != pixWidth || m.currentPos.Y != pixHeight {
 			fmt.Printf("우 : x: %d y:  %d\n", cx-pixWidth, cy-pixHeight)
 			mouseEvent := mouse.Mouse{device.Point{cx, cy}, cx - pixWidth, cy - pixHeight}
