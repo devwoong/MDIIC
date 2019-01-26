@@ -65,7 +65,7 @@ func (m *MouseEvent) MouseProc() {
 		} else {
 			if m.app.IsServer == true {
 				ox, oy := m.currentPos.GetVelocity(m.prevPos)
-				mouseEvent := mouse.Mouse{device.Point{cx, cy}, 2, 2}
+				mouseEvent := mouse.Mouse{device.Point{cx, cy}, cx - m.prevPos.X, cy - m.prevPos.Y}
 				mouseMove := common.Message{}
 				mouseMove.Type = common.MSG_MOUSE
 				mouseMove.Code = common.MOUSE_MOVE
