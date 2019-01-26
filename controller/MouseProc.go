@@ -26,61 +26,60 @@ func (m *MouseEvent) Initialize(app *appObject) {
 func (m *MouseEvent) MouseProc() {
 
 	width, height := m.app.Screen.Main.GetSize()
+	pixWidth := width - 10
+	pixHeight := height - 10
 	m.currentPos.SetPoint(robotgo.GetMousePos())
+	cx, cy := m.currentPos.GetPoint()
 
-	if m.currentPos.Equals(&m.prevPos.Point) == false {
-		cx, cy := m.currentPos.GetPoint()
+	if m.currentPos.Equals(&m.prevPos.Point) == false && m.app.IsFoucs == true {
 		px, _ := m.prevPos.GetPoint()
 		//event
 		// 좌 끝단 도달
-		if m.app.IsFoucs == true {
-			if cx <= 0 && px <= 0 {
-				fmt.Printf("좌 끝단 : x: %d y:  %d\n", cx, cy)
-				if m.app.IsServer == false {
-					focusChange := common.Message{}
-					focusChange.Type = common.MSG_SCREEN
-					focusChange.Code = common.SCREEN_FOCUS_LEFT_CHANGE
-					mouseMsg := mouse.Mouse{}
-					mouseMsg.X = cx
-					mouseMsg.Y = cy
-					focusChange.Message = common.ObjectToByte(mouseMsg)
-					m.app.SendMessage <- focusChange
-				}
-			} else if cx >= width-1 && px >= width-1 {
-				ox, oy := m.currentPos.GetVelocity(m.prevPos)
-				fmt.Printf("우 끝단 : x: %d y:  %d\n", ox, oy)
-				if m.app.IsServer == true {
-					m.app.IsFoucs = false
-					focusChange := common.Message{}
-					focusChange.Type = common.MSG_SCREEN
-					focusChange.Code = common.SCREEN_FOCUS_RIGHT_CHANGE
-					mouseMsg := mouse.Mouse{}
-					mouseMsg.X = cx
-					mouseMsg.Y = cy
-					focusChange.Message = common.ObjectToByte(mouseMsg)
-					m.app.SendMessage <- focusChange
-				}
+		//if m.app.IsFoucs == true {
+		if cx <= 0 && px <= 0 {
+			fmt.Printf("좌 끝단 : x: %d y:  %d\n", cx, cy)
+			if m.app.IsServer == false {
+				focusChange := common.Message{}
+				focusChange.Type = common.MSG_SCREEN
+				focusChange.Code = common.SCREEN_FOCUS_LEFT_CHANGE
+				mouseMsg := mouse.Mouse{}
+				mouseMsg.X = cx
+				mouseMsg.Y = cy
+				focusChange.Message = common.ObjectToByte(mouseMsg)
+				m.app.SendMessage <- focusChange
 			}
-			m.prevPos.Initialize(m.currentPos.Point)
-		} else {
+		} else if cx >= width-1 && px >= width-1 {
+			ox, oy := m.currentPos.GetVelocity(m.prevPos)
+			fmt.Printf("우 끝단 : x: %d y:  %d\n", ox, oy)
 			if m.app.IsServer == true {
-				ox, oy := m.currentPos.GetVelocity(m.prevPos)
-				mouseEvent := mouse.Mouse{device.Point{cx, cy}, cx - m.prevPos.X, cy - m.prevPos.Y}
-				mouseMove := common.Message{}
-				mouseMove.Type = common.MSG_MOUSE
-				mouseMove.Code = common.MOUSE_MOVE
-				mouseMove.IsServer = m.app.IsServer
-				mouseMove.Message = common.ObjectToByte(mouseEvent)
-				m.app.SendMessage <- mouseMove
-
-				robotgo.MoveMouse(width-10, height-10)
-				m.prevPos.X = width - 10 - ox
-				m.prevPos.Y = height - 10 - oy
-				m.prevPos.Initialize(m.currentPos.Point)
+				m.app.IsFoucs = false
+				focusChange := common.Message{}
+				focusChange.Type = common.MSG_SCREEN
+				focusChange.Code = common.SCREEN_FOCUS_RIGHT_CHANGE
+				mouseMsg := mouse.Mouse{}
+				mouseMsg.X = cx
+				mouseMsg.Y = cy
+				focusChange.Message = common.ObjectToByte(mouseMsg)
+				m.app.SendMessage <- focusChange
 			}
 		}
+		m.prevPos.Initialize(m.currentPos.Point)
+	} else {
+		// ox, oy := m.currentPos.GetVelocity(m.prevPos)
+		if m.currentPos.X != pixWidth || m.currentPos.Y != pixHeight {
+			fmt.Printf("우 : x: %d y:  %d\n", cx-pixWidth, cy-pixHeight)
+			mouseEvent := mouse.Mouse{device.Point{cx, cy}, cx - pixWidth, cy - pixHeight}
+			mouseMove := common.Message{}
+			mouseMove.Type = common.MSG_MOUSE
+			mouseMove.Code = common.MOUSE_MOVE
+			mouseMove.IsServer = m.app.IsServer
+			mouseMove.Message = common.ObjectToByte(mouseEvent)
+			m.app.SendMessage <- mouseMove
 
+			robotgo.MoveMouse(pixWidth, pixHeight)
+		}
 	}
+
 	if m.onEvent == false {
 		go m.onMouseEvent()
 	}
