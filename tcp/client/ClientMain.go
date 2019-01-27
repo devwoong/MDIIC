@@ -2,7 +2,7 @@ package client
 
 import (
 	"MDIIC/common"
-	"MDIIC/controller"
+	clientApp "MDIIC/controller/client"
 	"MDIIC/tcp/client/message"
 	"MDIIC/tcp/client/protocol"
 	"bufio"
@@ -47,7 +47,7 @@ func ClientMain() {
 	go recvMsgProc()
 	go tick()
 	go sendMessage()
-	go controller.GetInstance().AppMain(false)
+	go clientApp.GetInstance().AppMain()
 	for {
 
 	}
@@ -83,9 +83,9 @@ RECV_EXIT:
 					v.RecvMessage(msg)
 				}
 			case common.MSG_MOUSE:
-				controller.GetInstance().RecvMessage <- msg
+				clientApp.GetInstance().RecvMessage <- msg
 			case common.MSG_SCREEN:
-				controller.GetInstance().RecvMessage <- msg
+				clientApp.GetInstance().RecvMessage <- msg
 			}
 
 		}
@@ -119,7 +119,7 @@ SEND_EXIT:
 				protocol.GetInstance().Conn.Write(common.ObjectToByte(AppMsg))
 				fmt.Printf(" :: %s\n", string(AppMsg.Message))
 			}
-		case clientMsg := <-controller.GetInstance().SendMessage:
+		case clientMsg := <-clientApp.GetInstance().SendMessage:
 			switch clientMsg.Type {
 			case common.MSG_EXIT:
 				break SEND_EXIT

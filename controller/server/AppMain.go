@@ -1,4 +1,4 @@
-package controller
+package server
 
 import (
 	"MDIIC/common"
@@ -19,19 +19,13 @@ type appObject struct {
 	RecvkeyboardMsg chan string
 	SendMessage     chan common.Message
 	RecvMessage     chan common.Message
-	IsServer        bool
 	IsFoucs         bool
 }
 
 var g_mouseEvent MouseEvent
 
-func (app *appObject) AppMain(IsServer bool) {
-	// robotgo.ScrollMouse(10, "up")
-	// robotgo.MouseClick("left", true)
-	// robotgo.MoveMouseSmooth(100, 200, 1.0, 100.0)
-
-	app.IsServer = IsServer
-	app.IsFoucs = IsServer
+func (app *appObject) AppMain() {
+	app.IsFoucs = true
 	app.Screen.Main.SetSize(robotgo.GetScreenSize())
 
 	g_mouseEvent = MouseEvent{}
@@ -97,17 +91,10 @@ EVENTEXIT:
 
 					switch message.Code {
 					case common.SCREEN_FOCUS_LEFT_CHANGE:
-						if app.IsServer == true {
-							app.IsFoucs = true
-							x, _ := app.Screen.Main.GetSize()
-							g_mouseEvent.SetMousePos(x-2, mouse.Y)
-							fmt.Printf("focus change false\n")
-						}
-					case common.SCREEN_FOCUS_RIGHT_CHANGE:
-						if app.IsServer == true {
-							g_mouseEvent.SetMousePos(0, mouse.Y)
-							fmt.Printf("focus change true\n")
-						}
+						app.IsFoucs = true
+						x, _ := app.Screen.Main.GetSize()
+						g_mouseEvent.SetMousePos(x-2, mouse.Y)
+						fmt.Printf("focus change false\n")
 					}
 				}
 			default:

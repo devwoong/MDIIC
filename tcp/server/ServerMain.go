@@ -2,7 +2,7 @@ package server
 
 import (
 	"MDIIC/common"
-	"MDIIC/controller"
+	serverApp "MDIIC/controller/server"
 	"MDIIC/tcp/server/protocol"
 	"bufio"
 	"fmt"
@@ -30,7 +30,7 @@ func ServerMain() {
 	server = protocol.Server{}
 	server.Initialize()
 
-	go controller.GetInstance().AppMain(true)
+	go serverApp.GetInstance().AppMain()
 	connectLoop(listener)
 }
 func connectLoop(listener *(net.TCPListener)) {
@@ -107,6 +107,10 @@ EXITRECV:
 				{
 					fmt.Printf("client %d message : %s \n", id, string(message.Message))
 				}
+			case common.MSG_SCREEN:
+				{
+					serverApp.GetInstance().RecvMessage <- message
+				}
 			default:
 				fmt.Printf("client %d message : %s \n", id, message.Type)
 			}
@@ -127,7 +131,7 @@ EXIT:
 
 				}
 			}
-		case appMessage := <-controller.GetInstance().SendMessage:
+		case appMessage := <-serverApp.GetInstance().SendMessage:
 			for _, c := range server.Clients {
 
 				c.Conn.Write(common.ObjectToByte(appMessage))
