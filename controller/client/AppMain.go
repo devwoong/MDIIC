@@ -91,7 +91,7 @@ EVENTEXIT:
 					switch message.Code {
 					case common.SCREEN_FOCUS_RIGHT_CHANGE:
 						app.IsFoucs = true
-						g_mouseEvent.SetMousePos(0, mouse.Y)
+						g_mouseEvent.SetMousePos(1, mouse.Y)
 						fmt.Printf("focus change true\n")
 					}
 				}
