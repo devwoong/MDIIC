@@ -64,23 +64,73 @@ func (m *MouseEvent) MouseProc() {
 			}
 		}
 		m.prevPos.Initialize(m.currentPos.Point)
-	} else if m.app.IsServer == true {
-		if m.currentPos.X != pixWidth || m.currentPos.Y != pixHeight {
-			fmt.Printf("우 : x: %d y:  %d\n", cx-pixWidth, cy-pixHeight)
-			mouseEvent := mouse.Mouse{device.Point{cx, cy}, cx - pixWidth, cy - pixHeight}
+	} else if m.app.IsServer == true && m.app.IsFoucs == false {
+		// if m.currentPos.X != pixWidth || m.currentPos.Y != pixHeight {
+		// 	fmt.Printf("우 : x: %d y:  %d\n", cx-pixWidth, cy-pixHeight)
+		// 	mouseEvent := mouse.Mouse{device.Point{cx, cy}, cx - pixWidth, cy - pixHeight}
+		// 	mouseMove := common.Message{}
+		// 	mouseMove.Type = common.MSG_MOUSE
+		// 	mouseMove.Code = common.MOUSE_MOVE
+		// 	mouseMove.IsServer = m.app.IsServer
+		// 	mouseMove.Message = common.ObjectToByte(mouseEvent)
+		// 	m.app.SendMessage <- mouseMove
+
+		// 	robotgo.MoveMouse(pixWidth, pixHeight)
+		// }
+
+		tickCount++
+		movePos.X += (cx - pixWidth)
+		movePos.Y += (cy - pixHeight)
+		if tickCount >= MOVE_TICK {
+			if movePos.X != 0 || movePos.Y != 0 {
+				mouseEvent := mouse.Mouse{}
+				mouseEvent.MoveX = movePos.X
+				mouseEvent.MoveY = movePos.Y
+				mouseMove := common.Message{}
+				mouseMove.Type = common.MSG_MOUSE
+				mouseMove.Code = common.MOUSE_MOVE
+				mouseMove.IsServer = m.app.IsServer
+				mouseMove.Message = common.ObjectToByte(mouseEvent)
+				m.app.SendMessage <- mouseMove
+				fmt.Printf("send : x: %d y:  %d\n", movePos.X, movePos.Y)
+				movePos.SetPoint(0, 0)
+			}
+			tickCount = 0
+		}
+		robotgo.MoveMouse(pixWidth, pixHeight)
+	}
+
+	//m.sendMouseMoveEvent(cx-pixWidth, cy-pixHeight)
+
+	if m.onEvent == false {
+		go m.onMouseEvent()
+	}
+}
+
+var tickCount int = 0
+var movePos device.Point = device.Point{0, 0}
+
+const MOVE_TICK int = 2
+
+func (m *MouseEvent) sendMouseMoveEvent(moveX, moveY int) {
+	tickCount++
+	movePos.X += moveX
+	movePos.Y += moveY
+	if tickCount >= 10 {
+		if movePos.X != 0 || movePos.Y != 0 {
+			mouseEvent := mouse.Mouse{}
+			mouseEvent.MoveX = movePos.X
+			mouseEvent.MoveY = movePos.Y
 			mouseMove := common.Message{}
 			mouseMove.Type = common.MSG_MOUSE
 			mouseMove.Code = common.MOUSE_MOVE
 			mouseMove.IsServer = m.app.IsServer
 			mouseMove.Message = common.ObjectToByte(mouseEvent)
 			m.app.SendMessage <- mouseMove
-
-			robotgo.MoveMouse(pixWidth, pixHeight)
+			fmt.Printf("send : x: %d y:  %d\n", movePos.X, movePos.Y)
+			movePos.SetPoint(0, 0)
 		}
-	}
-
-	if m.onEvent == false {
-		go m.onMouseEvent()
+		tickCount = 0
 	}
 }
 
