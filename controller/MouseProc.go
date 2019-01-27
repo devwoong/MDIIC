@@ -44,6 +44,7 @@ func (m *MouseEvent) MouseProc() {
 		if cx <= 0 && px <= 0 {
 			fmt.Printf("좌 끝단 : x: %d y:  %d\n", cx, cy)
 			if m.app.IsServer == false {
+				m.app.IsFoucs = false
 				focusChange := common.Message{}
 				focusChange.Type = common.MSG_SCREEN
 				focusChange.Code = common.SCREEN_FOCUS_LEFT_CHANGE

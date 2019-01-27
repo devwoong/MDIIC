@@ -97,7 +97,7 @@ EVENTEXIT:
 
 					switch message.Code {
 					case common.SCREEN_FOCUS_LEFT_CHANGE:
-						if app.IsServer == false {
+						if app.IsServer == true {
 							app.IsFoucs = true
 							x, _ := app.Screen.Main.GetSize()
 							g_mouseEvent.SetMousePos(x, mouse.Y)
