@@ -1,3 +1,3 @@
 MDIIC(Multiple Device Integration Input Controller)
 
-2019.01.28 / robotgo ÀÔ·ÂÀÌº¥Æ® ¹®Á¦
+2019.01.28 / robotgo ì…ë ¥ì´ë²¤íŠ¸ ë¬¸ì œ
